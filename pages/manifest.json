@@ -8,7 +8,7 @@
   "theme_color": "#0c4a6e",
   "icons": [
     {
-      "src": "assets/logotbdg.png",
+      "src": "/assets/logotbdg.png",
       "sizes": "512x512",
       "type": "image/png"
     }
