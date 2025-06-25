@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - TEBARDARLING</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        .leaflet-container {
+            height: 450px;
+            width: 100%;
+            border-radius: 0.5rem; /* rounded-lg */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            z-index: 1;
+        }
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.6); 
+            padding-top: 20px;
+            animation: fadeIn 0.3s;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 800px; /* Wider modal for admin details */
+            border-radius: 0.5rem;
+            animation: slideIn 0.3s;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal-header {
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .close-button {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+        }
+        #adminMap .leaflet-popup-content-wrapper {
+            border-radius: 5px;
+        }
+        #adminMap .leaflet-popup-content p {
+            margin: 5px 0;
+        }
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-active { background-color: #22c55e; } /* green-500 */
+        .status-inactive { background-color: #ef4444; } /* red-500 */
+
+        /* Tab styling */
+        .tabs button {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tabs button.active {
+            border-bottom-color: #0ea5e9; /* sky-500 */
+            font-weight: 600;
+            color: #0ea5e9;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800">TEBARDARLING</h1>
+            <p class="text-gray-600">Pengelolaan dan Pemantauan Petugas Lapangan</p>
+        </header>
+
+        <!-- Ringkasan Statistik -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-700">Total Petugas</h3>
+                <p id="totalOfficers" class="text-3xl font-bold text-sky-600">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-700">Petugas Aktif</h3>
+                <p id="activeOfficers" class="text-3xl font-bold text-green-600">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-700">Dokumentasi Hari Ini</h3>
+                <p id="docsToday" class="text-3xl font-bold text-blue-600">0</p>
+            </div>
+        </div>
+
+        <!-- Peta Lokasi Petugas -->
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold text-gray-700"><i class="fas fa-map-marked-alt mr-3"></i> Peta Lokasi Petugas (Real-time)</h2>
+                <button id="refreshMapButton" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg text-sm">
+                    <i class="fas fa-sync-alt"></i> Segarkan Data
+                </button>
+            </div>
+            <div id="adminMap" class="leaflet-container"></div>
+        </div>
+
+        <!-- Daftar Petugas dan Detail -->
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4"><i class="fas fa-users mr-3"></i> Daftar Petugas</h2>
+            <input type="text" id="searchOfficerInput" placeholder="Cari petugas berdasarkan nama..." class="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-sky-500 focus:border-sky-500">
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Petugas</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu Aktif Terakhir</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="officersTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Data petugas akan dimuat di sini -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Petugas -->
+    <div id="officerDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalOfficerName" class="text-2xl font-semibold text-gray-800">Detail Petugas</h2>
+                <span class="close-button" onclick="closeModal()">&times;</span>
+            </div>
+            
+            <div class="tabs mb-4 border-b border-gray-200">
+                <button class="tab-button active" data-tab="attendanceLogTab">Log Absensi</button>
+                <button class="tab-button" data-tab="documentationTab">Dokumentasi Kerja</button>
+                <button class="tab-button" data-tab="locationHistoryTab">Riwayat Lokasi</button>
+            </div>
+
+            <div id="attendanceLogTab" class="tab-content active">
+                <div class="overflow-y-auto max-h-96">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Masuk</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Keluar</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Durasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalAttendanceLog" class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="documentationTab" class="tab-content">
+                <div id="modalDocumentation" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto max-h-96"></div>
+            </div>
+
+            <div id="locationHistoryTab" class="tab-content">
+                 <div id="modalLocationHistory" class="overflow-y-auto max-h-96"></div>
+            </div>
+
+             <button onclick="closeModal()" class="mt-6 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Tutup</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+        const SUPABASE_URL = 'https://zunrijrufbpldgfztroz.supabase.co';
+        // --- PERBAIKAN: Pastikan Anda menggunakan kunci ANON yang benar ---
+        // Kunci ini HARUS sama dengan yang digunakan di halaman petugas.
+        // Untuk keamanan, pastikan RLS sudah dikonfigurasi dengan benar untuk setiap tabel.
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1bnJpanJ1ZmJwbGRnZnp0cm96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwMjY4MzcsImV4cCI6MjA2NDYwMjgzN30.bUDiCIx-gM_nBUZWoU8N2311MlwQq7SOt1-fkyyWdbU';
+
+        if (!SUPABASE_URL || SUPABASE_ANON_KEY.includes('YOUR_SUPABASE')) {
+            alert("PENTING: Harap konfigurasi SUPABASE_URL dan SUPABASE_ANON_KEY dalam kode JavaScript!");
+        }
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- DOM Elements ---
+        const totalOfficersEl = document.getElementById('totalOfficers');
+        const activeOfficersEl = document.getElementById('activeOfficers');
+        const docsTodayEl = document.getElementById('docsToday');
+        const adminMapEl = document.getElementById('adminMap');
+        const officersTableBody = document.getElementById('officersTableBody');
+        const searchOfficerInput = document.getElementById('searchOfficerInput');
+        const officerDetailModal = document.getElementById('officerDetailModal');
+        const modalOfficerName = document.getElementById('modalOfficerName');
+        const modalAttendanceLog = document.getElementById('modalAttendanceLog');
+        const modalDocumentation = document.getElementById('modalDocumentation');
+        const modalLocationHistory = document.getElementById('modalLocationHistory');
+        const refreshMapButton = document.getElementById('refreshMapButton');
+
+        // --- App State ---
+        let adminMap = null;
+        let officerMarkers = {};
+        let allOfficersData = []; 
+
+        async function initializeApp() {
+            // --- PERBAIKAN: Verifikasi sesi tidak diperlukan jika menggunakan RLS dengan benar ---
+            // RLS akan menangani keamanan di level database.
+            console.log("Admin dashboard initialized.");
+            initAdminMap();
+            loadAllData();
+            setupRealtimeListeners();
+            searchOfficerInput.addEventListener('input', () => renderOfficersTable(allOfficersData));
+            refreshMapButton.addEventListener('click', loadAllData);
+            setupTabs();
+        }
+
+        function initAdminMap() {
+            if (adminMap) return;
+            const defaultLocation = [3.5952, 98.6722]; // Medan
+            adminMap = L.map(adminMapEl).setView(defaultLocation, 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; TEBARDARLING REALTIME'
+            }).addTo(adminMap);
+        }
+
+        async function loadAllData() {
+            officersTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Memuat data... <i class="fas fa-spinner fa-spin"></i></td></tr>';
+            
+            try {
+                // --- PERBAIKAN: Mengambil data dari 'profiles' sebagai sumber utama ---
+                const { data: profiles, error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .select('id, full_name');
+                if (profileError) throw profileError;
+
+                // --- PERBAIKAN: Mengambil data absensi yang relevan untuk status ---
+                const { data: attendance, error: attendanceError } = await supabaseClient
+                    .from('attendance')
+                    .select('officer_id, clock_in_time, clock_out_time');
+                if (attendanceError) throw attendanceError;
+
+                // --- Menggabungkan data (meniru JOIN di client-side) ---
+                const combinedData = profiles.map(profile => {
+                    const officerAttendances = attendance.filter(a => a.officer_id === profile.id);
+                    const lastAttendance = officerAttendances.sort((a, b) => new Date(b.clock_in_time) - new Date(a.clock_in_time))[0];
+                    
+                    const isClockedIn = lastAttendance ? !lastAttendance.clock_out_time : false;
+                    const lastActive = lastAttendance ? lastAttendance.clock_in_time : null;
+
+                    return {
+                        id: profile.id,
+                        full_name: profile.full_name || 'Tanpa Nama',
+                        is_clocked_in: isClockedIn,
+                        last_active_time: lastActive,
+                    };
+                });
+                
+                allOfficersData = combinedData;
+
+                renderOfficersTable(allOfficersData);
+                updateOfficerLocationsOnMap(allOfficersData);
+                updateStatistics(allOfficersData);
+
+            } catch (error) {
+                console.error("Gagal memuat data gabungan:", error);
+                officersTableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat data: ${error.message}</td></tr>`;
+            }
+        }
+
+        function renderOfficersTable(officers) {
+            const searchTerm = searchOfficerInput.value.toLowerCase();
+            const filteredOfficers = officers.filter(officer => 
+                officer.full_name.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredOfficers.length === 0) {
+                officersTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Tidak ada petugas ditemukan.</td></tr>';
+                return;
+            }
+
+            officersTableBody.innerHTML = filteredOfficers.map(officer => {
+                const statusClass = officer.is_clocked_in ? 'status-active' : 'status-inactive';
+                const statusText = officer.is_clocked_in ? 'Aktif' : 'Nonaktif';
+                const lastActiveStr = officer.last_active_time ? new Date(officer.last_active_time).toLocaleString('id-ID') : 'Belum pernah';
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="status-dot ${statusClass}"></span>${statusText}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${officer.full_name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Masuk: ${lastActiveStr}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button onclick="window.viewOfficerDetails('${officer.id}', '${officer.full_name.replace(/'/g, "\\'")}')" class="text-sky-600 hover:text-sky-800">Lihat Detail</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        async function updateOfficerLocationsOnMap(officers) {
+             // Hapus marker yang sudah tidak aktif
+            Object.keys(officerMarkers).forEach(officerId => {
+                if (!officers.some(o => o.id === officerId && o.is_clocked_in)) {
+                    adminMap.removeLayer(officerMarkers[officerId]);
+                    delete officerMarkers[officerId];
+                }
+            });
+
+            const activeOfficerIds = officers.filter(o => o.is_clocked_in).map(o => o.id);
+            if (activeOfficerIds.length === 0) return;
+
+            // Ambil lokasi TERBARU dari setiap petugas yang aktif
+            const { data: locations, error } = await supabaseClient.rpc('get_latest_officer_locations', {
+                officer_ids: activeOfficerIds
+            });
+
+            if (error) {
+                console.error("Error fetching latest locations:", error);
+                return;
+            }
+
+            locations.forEach(loc => {
+                const officer = officers.find(o => o.id === loc.officer_id);
+                if (!officer) return;
+
+                const popupContent = `
+                    <b>${officer.full_name}</b><br>
+                    Update: ${new Date(loc.max_timestamp).toLocaleTimeString('id-ID')}
+                `;
+
+                if (officerMarkers[loc.officer_id]) {
+                    officerMarkers[loc.officer_id].setLatLng([loc.latitude, loc.longitude]).setPopupContent(popupContent);
+                } else {
+                    officerMarkers[loc.officer_id] = L.marker([loc.latitude, loc.longitude])
+                        .addTo(adminMap)
+                        .bindPopup(popupContent);
+                }
+            });
+        }
+
+
+        async function updateStatistics(officers) {
+            totalOfficersEl.textContent = officers.length;
+            activeOfficersEl.textContent = officers.filter(o => o.is_clocked_in).length;
+
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            
+            const { count, error } = await supabaseClient
+                .from('work_documentation')
+                .select('*', { count: 'exact', head: true })
+                .gte('created_at', todayStart.toISOString());
+            
+            if (error) console.error("Error fetching docs today count:", error);
+            docsTodayEl.textContent = error ? 'Error' : (count || 0);
+        }
+
+        window.viewOfficerDetails = async function(officerId, officerName) {
+            modalOfficerName.textContent = `Detail: ${officerName}`;
+            // Reset tab
+            document.querySelector('.tab-button[data-tab="attendanceLogTab"]').click();
+            officerDetailModal.style.display = "block";
+            
+            // Load Attendance
+            modalAttendanceLog.innerHTML = '<tr><td colspan="3" class="text-center py-3">Memuat...</td></tr>';
+            const { data: attendance, error: attError } = await supabaseClient.from('attendance').select('*').eq('officer_id', officerId).order('clock_in_time', { ascending: false });
+            if (attError) modalAttendanceLog.innerHTML = '<tr><td colspan="3" class="text-red-500 text-center py-3">Gagal memuat.</td></tr>';
+            else if (attendance.length === 0) modalAttendanceLog.innerHTML = '<tr><td colspan="3" class="text-center py-3">Tidak ada data.</td></tr>';
+            else {
+                modalAttendanceLog.innerHTML = attendance.map(log => `
+                    <tr>
+                        <td class="px-4 py-3 text-sm">${new Date(log.clock_in_time).toLocaleString('id-ID')}</td>
+                        <td class="px-4 py-3 text-sm">${log.clock_out_time ? new Date(log.clock_out_time).toLocaleString('id-ID') : 'Masih Bekerja'}</td>
+                        <td class="px-4 py-3 text-sm">${log.work_duration_ms ? formatDuration(log.work_duration_ms) : '-'}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            // Load Documentation
+            modalDocumentation.innerHTML = '<p class="text-center col-span-full">Memuat...</p>';
+            const { data: docs, error: docError } = await supabaseClient.from('work_documentation').select('*').eq('officer_id', officerId).order('timestamp', { ascending: false });
+            if (docError) modalDocumentation.innerHTML = '<p class="text-red-500 text-center col-span-full">Gagal memuat.</p>';
+            else if (docs.length === 0) modalDocumentation.innerHTML = '<p class="text-center col-span-full">Tidak ada dokumentasi.</p>';
+            else {
+                modalDocumentation.innerHTML = docs.map(doc => {
+                    const { data: { publicUrl } } = supabaseClient.storage.from('photos').getPublicUrl(doc.photo_path);
+                    return `
+                        <div class="border rounded-lg p-3 shadow-sm">
+                            <a href="${publicUrl}" target="_blank"><img src="${publicUrl}" alt="Dokumentasi" class="w-full h-40 object-cover rounded mb-2" onerror="this.src='https://placehold.co/300x200/e2e8f0/94a3b8?text=Gagal+Muat';"></a>
+                            <p class="text-sm text-gray-700">${doc.description || ''}</p>
+                            <p class="text-xs text-gray-500 mt-1">${new Date(doc.timestamp).toLocaleString('id-ID')}</p>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Load Location History
+            modalLocationHistory.innerHTML = '<p class="text-center">Memuat riwayat lokasi...</p>';
+            const { data: locations, error: locError } = await supabaseClient.from('officer_locations').select('*').eq('officer_id', officerId).order('timestamp', { ascending: false }).limit(100);
+            if(locError) modalLocationHistory.innerHTML = '<p class="text-red-500 text-center">Gagal memuat riwayat.</p>';
+            else if (locations.length === 0) modalLocationHistory.innerHTML = '<p class="text-center">Tidak ada riwayat lokasi.</p>';
+            else {
+                modalLocationHistory.innerHTML = `<ul class="list-disc pl-5">${locations.map(loc => `<li>${new Date(loc.timestamp).toLocaleString('id-ID')} - Lat: ${loc.latitude.toFixed(4)}, Lng: ${loc.longitude.toFixed(4)}</li>`).join('')}</ul>`;
+            }
+        }
+        
+        function formatDuration(ms) {
+            if (!ms) return '-';
+            let seconds = Math.floor((ms / 1000) % 60);
+            let minutes = Math.floor((ms / (1000 * 60)) % 60);
+            let hours = Math.floor(ms / (1000 * 60 * 60));
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        window.closeModal = function() { officerDetailModal.style.display = "none"; }
+        
+        function setupTabs() {
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    button.classList.add('active');
+                    document.getElementById(button.dataset.tab).classList.add('active');
+                });
+            });
+        }
+
+        function setupRealtimeListeners() {
+            const channel = supabaseClient.channel('admin-dashboard');
+            channel.on('postgres_changes', { event: '*', schema: 'public' }, payload => {
+                console.log('Perubahan terdeteksi:', payload.table);
+                // Muat ulang semua data jika ada perubahan di tabel-tabel penting
+                if (['profiles', 'attendance', 'officer_locations', 'work_documentation'].includes(payload.table)) {
+                    loadAllData();
+                }
+            }).subscribe();
+        }
+
+        initializeApp();
+    </script>
+</body>
+</html>

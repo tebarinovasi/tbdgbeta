@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEBARDARLING - Teladan Barat Sadar Lingkungan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .hero-gradient {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/assets/istana.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: #10B981; /* Emerald-500 */
+            margin: 16px auto 0;
+        }
+        .program-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .gallery-img {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .gallery-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2), 0 4px 6px -2px rgba(0,0,0,0.1);
+        }
+        /* Custom scrollbar for a more premium feel - Optional */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .hero-logo {
+            max-width: 300px; /* Adjust as needed */
+            height: auto;
+            margin-bottom: 1.5rem; /* Corresponds to mb-6 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-emerald-600">
+                TEBAR<span class="text-slate-700">DARLING</span>
+            </a>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="#hero" class="text-slate-600 hover:text-emerald-500 transition duration-300">Beranda</a>
+                <a href="#tentang" class="text-slate-600 hover:text-emerald-500 transition duration-300">Tentang Kami</a>
+                <a href="#program" class="text-slate-600 hover:text-emerald-500 transition duration-300">Program</a>
+                <a href="#galeri" class="text-slate-600 hover:text-emerald-500 transition duration-300">Galeri</a>
+                <a href="#bergabung" class="text-slate-600 hover:text-emerald-500 transition duration-300">Bergabung</a>
+                <a href="#kontak" class="text-slate-600 hover:text-emerald-500 transition duration-300">Kontak</a>
+                <a href="/pages/login.html" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition duration-300">Login Ke Sistem</a>
+            </div>
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-slate-600 hover:text-emerald-500 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg">
+            <a href="#hero" class="block px-6 py-3 text-slate-600 hover:bg-emerald-50 hover:text-emerald-500 transition duration-300">Beranda</a>
+            <a href="#tentang" class="block px-6 py-3 text-slate-600 hover:bg-emerald-50 hover:text-emerald-500 transition duration-300">Tentang Kami</a>
+            <a href="#program" class="block px-6 py-3 text-slate-600 hover:bg-emerald-50 hover:text-emerald-500 transition duration-300">Program</a>
+            <a href="#galeri" class="block px-6 py-3 text-slate-600 hover:bg-emerald-50 hover:text-emerald-500 transition duration-300">Galeri</a>
+            <a href="#bergabung" class="block px-6 py-3 text-slate-600 hover:bg-emerald-50 hover:text-emerald-500 transition duration-300">Bergabung</a>
+            <a href="#kontak" class="block px-6 py-3 text-slate-600 hover:bg-emerald-50 hover:text-emerald-500 transition duration-300">Kontak</a>
+            <a href="/pages/login.html" class="block mx-4 my-3 text-center bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition duration-300">Login Ke Sistem</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="hero" class="hero-gradient text-white h-[calc(100vh-68px)] flex items-center justify-center">
+        <div class="text-center px-4 flex flex-col items-center">
+            <p class="text-lg md:text-2xl mb-10 max-w-3xl mx-auto font-light">
+                Bersama kita ciptakan lingkungan yang bersih, sehat, dan asri untuk generasi sekarang dan mendatang.
+            </p>
+            <a href="/pages/login.html" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-10 rounded-lg text-lg shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-105">
+                Login Ke Sistem
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Tentang Kami Section -->
+        <section id="tentang" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-slate-800 section-title">Mengenal TEBARDARLING</h2>
+                </div>
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/2">
+                        <img src="/assets/c.png" alt="[Gambar Komunitas Peduli Lingkungan]" class="rounded-xl shadow-2xl w-full">
+                    </div>
+                    <div class="md:w-1/2 text-lg text-slate-600 space-y-6">
+                        <p class="leading-relaxed">
+                            <strong>TEBARDARLING (Teladan Barat Sadar Lingkungan)</strong> adalah sebuah gerakan inisiatif yang lahir dari kepedulian masyarakat Kelurahan Teladan Barat, Kota Medan, terhadap kualitas lingkungan hidup. Kami berkomitmen untuk membangun kesadaran kolektif dan mendorong partisipasi aktif seluruh elemen masyarakat dalam menjaga, merawat, serta melestarikan lingkungan demi masa depan yang lebih baik.
+                        </p>
+                        <p class="leading-relaxed">
+                            Visi kami adalah mewujudkan Teladan Barat sebagai kelurahan percontohan yang hijau, bersih, sehat, dan berkelanjutan. Misi kami meliputi edukasi lingkungan, pengelolaan sampah terpadu, program penghijauan, serta pemberdayaan masyarakat melalui kegiatan-kegiatan ramah lingkungan.
+                        </p>
+                        <p class="leading-relaxed">
+                            Kami percaya bahwa perubahan besar dimulai dari langkah-langkah kecil yang konsisten. Bergabunglah bersama kami, karena setiap kontribusi Anda sangat berarti.
+                        </p>
+                         <a href="#program" class="inline-block mt-4 bg-slate-700 hover:bg-slate-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                            Lihat Program Kami
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Program Unggulan Section -->
+        <section id="program" class="py-20 bg-slate-100">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-slate-800 section-title">Inisiatif Unggulan Kami</h2>
+                    <p class="text-lg text-slate-600 mt-4 max-w-2xl mx-auto">Program-program yang kami rancang untuk memberikan dampak nyata bagi lingkungan dan masyarakat Teladan Barat.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <!-- Program Card 1 -->
+                    <div class="bg-white rounded-xl shadow-lg p-8 program-card transition-all duration-300 ease-in-out">
+                        <div class="text-emerald-500 mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 text-center">Bank Sampah Cerdas</h3>
+                        <p class="text-slate-600 leading-relaxed text-center">
+                            Mengubah sampah menjadi aset berharga melalui sistem pengelolaan sampah yang terpilah, inovatif, dan memberdayakan ekonomi masyarakat.
+                        </p>
+                    </div>
+                    <!-- Program Card 2 -->
+                    <div class="bg-white rounded-xl shadow-lg p-8 program-card transition-all duration-300 ease-in-out">
+                        <div class="text-emerald-500 mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 text-center">Edukasi Lingkungan Kreatif</h3>
+                        <p class="text-slate-600 leading-relaxed text-center">
+                            Meningkatkan kesadaran dan pengetahuan masyarakat, khususnya generasi muda, tentang isu lingkungan melalui workshop, seminar, dan kampanye kreatif.
+                        </p>
+                    </div>
+                    <!-- Program Card 3 -->
+                    <div class="bg-white rounded-xl shadow-lg p-8 program-card transition-all duration-300 ease-in-out">
+                         <div class="text-emerald-500 mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A8.003 8.003 0 0122 12c0 3-1 7-6.343 6.657z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.555 16.048A5.904 5.904 0 0012 17.5c.998 0 1.937-.24 2.765-.663m-5.53-.925A5.905 5.905 0 006.5 12c0-.998.24-1.937.663-2.765m9.25 5.53A5.905 5.905 0 0017.5 12c0-.998-.24-1.937-.663-2.765" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 17.5V21M6.5 12H3m3.5 0S6 14.5 9 14.5M12 6.5V3m5.5 3.5S14.5 6 14.5 9" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 text-center">Penghijauan & Taman Komunitas</h3>
+                        <p class="text-slate-600 leading-relaxed text-center">
+                           Menanam pohon, membuat taman tematik, dan merawat ruang terbuka hijau untuk menciptakan lingkungan yang lebih sejuk, asri, dan sehat bagi semua.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Galeri Section -->
+        <section id="galeri" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-slate-800 section-title">Momen Kegiatan TEBARDARLING</h2>
+                    <p class="text-lg text-slate-600 mt-4 max-w-2xl mx-auto">Lihatlah semangat kebersamaan dan dampak positif yang telah kami ciptakan.</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <img src="/assets/kegiatan1.jpeg" alt="[Foto Kegiatan Penanaman Pohon]" class="rounded-lg shadow-md gallery-img w-full h-64 object-cover">
+                    <img src="/assets/kegiatan2.jpeg" alt="[Foto Workshop Daur Ulang Sampah]" class="rounded-lg shadow-md gallery-img w-full h-64 object-cover">
+                    <img src="/assets/kegiatan3.jpeg" alt="[Foto Pembersihan Sungai]" class="rounded-lg shadow-md gallery-img w-full h-64 object-cover">
+                    <img src="/assets/kegiatan4.jpeg" alt="[Foto Edukasi Anak-anak]" class="rounded-lg shadow-md gallery-img w-full h-64 object-cover">
+                    <img src="/assets/kegiatan5.jpeg" alt="[Foto Pembuatan Kompos]" class="rounded-lg shadow-md gallery-img md:col-span-1 lg:col-span-2 w-full h-64 object-cover">
+                    <img src="/assets/kegiatan6.jpeg" alt="[Foto Panen Kebun Komunitas]" class="rounded-lg shadow-md gallery-img w-full h-64 object-cover">
+                    <img src="/assets/kegiatan7.jpeg" alt="[Foto Diskusi Lingkungan]" class="rounded-lg shadow-md gallery-img w-full h-64 object-cover">
+                    <img src="/assets/kegiatan8.jpeg" alt="[Foto Gotong Royong Warga]" class="rounded-lg shadow-md gallery-img md:col-span-2 lg:col-span-4 w-full h-64 object-cover">
+                </div>
+            </div>
+        </section>
+
+        <!-- Bergabunglah Section -->
+        <section id="bergabung" class="py-20 bg-emerald-600 text-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-extrabold mb-6 section-title-light">Ayo Berkontribusi!</h2>
+                <p class="text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+                    Jadilah bagian dari perubahan positif di Teladan Barat. Setiap tindakan kecil Anda memiliki dampak besar untuk lingkungan kita bersama.
+                </p>
+                <div class="flex flex-col md:flex-row justify-center items-center space-y-6 md:space-y-0 md:space-x-6">
+                    <a href="#kontak" class="bg-white text-emerald-600 font-bold py-4 px-10 rounded-lg text-lg shadow-xl hover:bg-slate-100 transition duration-300 transform hover:scale-105">
+                        Jadi Relawan
+                    </a>
+                    <a href="#" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-4 px-10 rounded-lg text-lg shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-105">
+                        Donasi Sekarang
+                    </a>
+                </div>
+            </div>
+            <style>
+                .section-title-light::after {
+                    background-color: #FFFFFF; /* White for dark background */
+                }
+            </style>
+        </section>
+
+        <!-- Kontak Section -->
+        <section id="kontak" class="py-20 bg-slate-100">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-slate-800 section-title">Terhubung Dengan Kami</h2>
+                    <p class="text-lg text-slate-600 mt-4 max-w-2xl mx-auto">Punya pertanyaan, saran, atau ingin berkolaborasi? Jangan ragu untuk menghubungi kami.</p>
+                </div>
+                <div class="max-w-3xl mx-auto bg-white p-10 rounded-xl shadow-2xl">
+                    <form action="#" method="POST" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-slate-700">Nama Lengkap</label>
+                            <input type="text" name="name" id="name" autocomplete="name" class="mt-1 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-slate-700">Alamat Email</label>
+                            <input type="email" name="email" id="email" autocomplete="email" class="mt-1 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm" required>
+                        </div>
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-slate-700">Subjek</label>
+                            <input type="text" name="subject" id="subject" class="mt-1 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm" required>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-slate-700">Pesan Anda</label>
+                            <textarea id="message" name="message" rows="4" class="mt-1 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm" required></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-emerald-500 hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition duration-300">
+                                Kirim Pesan
+                            </button>
+                        </div>
+                    </form>
+                    <div class="mt-10 text-center text-slate-600">
+                        <p class="text-lg font-semibold">Informasi Kontak Langsung:</p>
+                        <p class="mt-2"><strong>Alamat:</strong> Jl. Sisingamangaraja Gg. Mesjid No.19, Kel. Teladan Barat, Kec. Medan Kota, Sumatera Utara 20212</p>
+                        <p><strong>Email:</strong> <a href="mailto:info@tebardarling.org" class="text-emerald-600 hover:underline">infotebardg@gmail.com</a></p>
+                        <div class="mt-6 flex justify-center space-x-6">
+                            <a href="https://www.facebook.com/kelurahan.telbar" class="text-slate-500 hover:text-emerald-600 transition duration-300">
+                                <span class="sr-only">Facebook</span>
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
+                            </a>
+                            <a href="https://www.instagram.com/kel_teladan_barat/" class="text-slate-500 hover:text-emerald-600 transition duration-300">
+                                <span class="sr-only">Instagram</span>
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.013-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427A4.902 4.902 0 013.45 5.422a4.902 4.902 0 011.772-1.153c.636-.247 1.363.416 2.427.465C8.726 2.012 9.08 2 11.515 2h.8zm-.8 2.023c-2.352 0-2.678.01-3.618.055-1.133.053-1.655.223-2.05.385-.447.18-.775.407-1.068.728-.293.32-.548.65-.728 1.068-.163.395-.333.917-.385 2.05-.045.94-.055 1.266-.055 3.618s.01 2.678.055 3.618c.053 1.133.223 1.655.385 2.05.18.447.407.775.728 1.068.32.293.65.548 1.068.728.395.163.917.333 2.05.385.94.045 1.266.055 3.618.055s2.678-.01 3.618-.055c1.133-.053 1.655-.223 2.05-.385.447.18-.775.407 1.068-.728.293-.32.548.65.728-1.068.163-.395.333.917.385-2.05.045.94.055 1.266.055 3.618s-.01-2.678-.055-3.618c-.053-1.133-.223-1.655-.385-2.05-.18-.447-.407-.775-.728-1.068-.32-.293-.65-.548-1.068-.728-.395-.163-.917-.333-2.05-.385-.94-.045-1.266-.055-3.618-.055zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 8.247a3.112 3.112 0 110-6.224 3.112 3.112 0 010 6.224zm4.569-6.464a1.148 1.148 0 100-2.296 1.148 1.148 0 000 2.296z" clip-rule="evenodd" /></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-300 py-12">
+        <div class="container mx-auto px-6 text-center">
+            <a href="#" class="text-3xl font-bold text-emerald-500">
+                TEBAR<span class="text-white">DARLING</span>
+            </a>
+            <p class="mt-4 mb-6 max-w-md mx-auto">
+                Teladan Barat Sadar Lingkungan. Bersama mewujudkan lingkungan yang lebih baik.
+            </p>
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="#hero" class="hover:text-emerald-400 transition duration-300">Beranda</a>
+                <a href="#tentang" class="hover:text-emerald-400 transition duration-300">Tentang</a>
+                <a href="#program" class="hover:text-emerald-400 transition duration-300">Program</a>
+                <a href="#galeri" class="hover:text-emerald-400 transition duration-300">Galeri</a>
+            </div>
+            <p class="text-sm">&copy; <span id="currentYear"></span> TEBARDARLING. Hak Cipta Dilindungi Undang-Undang.</p>
+            <p class="text-xs mt-1">Dirancang oleh CommeDesKAEL.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when a link is clicked
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Smooth scroll for anchor links (optional, as CSS scroll-behavior: smooth is used)
+        // document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        //     anchor.addEventListener('click', function (e) {
+        //         e.preventDefault();
+        //         document.querySelector(this.getAttribute('href')).scrollIntoView({
+        //             behavior: 'smooth'
+        //         });
+        //     });
+        // });
+    </script>
+
+</body>
+</html>

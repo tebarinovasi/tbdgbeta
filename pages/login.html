@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TEBARDARLING</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('/assets/istana.jpg'); /* Latar belakang diubah ke istana.jpg */
+            background-size: cover; /* Pastikan gambar latar menutupi seluruh halaman */
+            background-position: center; /* Pusatkan gambar latar */
+            background-repeat: no-repeat; /* Jangan ulangi gambar latar */
+            background-attachment: fixed; /* Opsional: Buat latar belakang tetap saat menggulir */
+            position: relative; /* Diperlukan untuk positioning overlay */
+        }
+        /* Overlay untuk latar belakang */
+        .background-overlay {
+            position: fixed; /* Atau absolute jika body tidak scroll dan full height */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Warna hitam dengan 50% opacity */
+            z-index: 0; /* Pastikan overlay di belakang konten lain */
+        }
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.92); /* Sedikit transparan putih, ditingkatkan opasitasnya sedikit */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px; /* Ditingkatkan untuk tampilan lebih lembut */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); /* Bayangan lebih tegas */
+            position: relative; /* Pastikan login container di atas overlay */
+            z-index: 1;
+        }
+        .tab-button {
+            transition: all 0.3s ease-in-out;
+            border-bottom-width: 4px;
+            border-bottom-color: transparent;
+        }
+        .tab-button.active {
+            border-bottom-color: #10B981; /* Emerald-500 */
+            color: #059669; /* Emerald-600 */
+            font-weight: 700;
+        }
+        .tab-button:not(.active):hover {
+            border-bottom-color: #A7F3D0; /* Emerald-200 */
+            color: #047857; /* Emerald-700 */
+        }
+        .form-input {
+            background-color: #F9FAFB; /* Gray-50 */
+            border: 1px solid #D1D5DB; /* Gray-300 */
+            color: #1F2937; /* Gray-800 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .form-input:focus {
+            border-color: #10B981; /* Emerald-500 */
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            outline: none;
+        }
+        .submit-button {
+            background-color: #10B981; /* Emerald-500 */
+            color: white;
+            font-weight: 600; /* semibold */
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+        }
+        .submit-button:hover {
+            background-color: #059669; /* Emerald-600 */
+            transform: translateY(-2px);
+        }
+        .submit-button:disabled {
+            background-color: #9CA3AF; /* Gray-400 */
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error-message {
+            background-color: #FEE2E2; /* Red-100 */
+            color: #B91C1C; /* Red-700 */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #F87171; /* Red-400 */
+            font-size: 0.875rem; /* text-sm */
+            margin-top: 1rem;
+        }
+        .guest-button {
+            background-color: #4F46E5; /* Indigo-600 */
+        }
+        .guest-button:hover {
+            background-color: #4338CA; /* Indigo-700 */
+        }
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #10B981; /* Emerald-500 */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+    <!-- Background Overlay -->
+    <div class="background-overlay"></div>
+
+    <!-- Panel login diperkecil: max-w-lg diubah menjadi max-w-md, padding disesuaikan -->
+    <div class="login-container w-full max-w-sm p-6 sm:p-10">
+
+        <!-- Tombol Tab -->
+        <div class="mb-6 sm:mb-8 flex border-b border-slate-300">
+            <button id="tabPetugas" class="tab-button flex-1 py-3 px-2 text-center text-slate-600 active" onclick="showTab('petugas')">Petugas</button>
+            <button id="tabAdmin" class="tab-button flex-1 py-3 px-2 text-center text-slate-600" onclick="showTab('admin')">Admin</button>
+            <button id="tabPengunjung" class="tab-button flex-1 py-3 px-2 text-center text-slate-600" onclick="showTab('pengunjung')">Pengunjung</button>
+        </div>
+
+        <!-- Konten Tab -->
+        <div id="loginPetugasContent">
+            <h2 class="text-xl sm:text-2xl font-semibold text-slate-700 text-center mb-6">Login Petugas</h2>
+            <form id="petugasLoginForm" class="space-y-5 sm:space-y-6">
+                <div>
+                    <label for="petugasEmail" class="block text-sm font-medium text-slate-700">Email</label>
+                    <input type="email" id="petugasEmail" name="email" class="form-input w-full" placeholder="email@contoh.com" required>
+                </div>
+                <div>
+                    <label for="petugasPassword" class="block text-sm font-medium text-slate-700">Password</label>
+                    <input type="password" id="petugasPassword" name="password" class="form-input w-full" placeholder="••••••••" required>
+                </div>
+                <div id="petugasError" class="error-message hidden"></div>
+                <button type="submit" id="petugasLoginButton" class="submit-button w-full flex items-center justify-center">
+                    Masuk sebagai Petugas
+                    <span id="petugasLoader" class="loader hidden ml-2"></span>
+                </button>
+            </form>
+         </div>
+
+        <div id="loginAdminContent" class="hidden">
+            <h2 class="text-xl sm:text-2xl font-semibold text-slate-700 text-center mb-6">Login Admin</h2>
+            <form id="adminLoginForm" class="space-y-5 sm:space-y-6">
+                <div>
+                    <label for="adminUsername" class="block text-sm font-medium text-slate-700">Username</label>
+                    <input type="text" id="adminUsername" name="username" class="form-input w-full" placeholder="username_admin" required>
+                </div>
+                <div>
+                    <label for="adminPassword" class="block text-sm font-medium text-slate-700">Password</label>
+                    <input type="password" id="adminPassword" name="password" class="form-input w-full" placeholder="••••••••" required>
+                </div>
+                <div id="adminError" class="error-message hidden"></div>
+                 <button type="submit" id="adminLoginButton" class="submit-button w-full flex items-center justify-center">
+                    Masuk sebagai Admin
+                    <span id="adminLoader" class="loader hidden ml-2"></span>
+                </button>
+            </form>
+             </div>
+
+        <div id="loginPengunjungContent" class="hidden">
+            <h2 class="text-xl sm:text-2xl font-semibold text-slate-700 text-center mb-6">Masuk sebagai Pengunjung</h2>
+            <p class="text-slate-600 text-center mb-6 text-sm sm:text-base">
+                Jelajahi informasi publik dan kegiatan TEBARDARLING tanpa perlu login.
+            </p>
+            <button id="guestLoginButton" class="submit-button guest-button w-full">Lanjutkan sebagai Pengunjung</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Inisialisasi Supabase Client ---
+        // GANTI DENGAN URL DAN ANON KEY SUPABASE PROYEK ANDA
+        const SUPABASE_URL = 'https://zunrijrufbpldgfztroz.supabase.co'; // Misalnya: 'https://xyz.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1bnJpanJ1ZmJwbGRnZnp0cm96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwMjY4MzcsImV4cCI6MjA2NDYwMjgzN30.bUDiCIx-gM_nBUZWoU8N2311MlwQq7SOt1-fkyyWdbU'; // Misalnya: 'eyJh...your...key...xyz'
+
+        let supabaseClient = null; // Mengganti nama variabel agar lebih jelas
+        try {
+            if (SUPABASE_URL === 'MASUKKAN_URL_SUPABASE_ANDA_DISINI' || SUPABASE_ANON_KEY === 'MASUKKAN_ANON_KEY_SUPABASE_ANDA_DISINI') {
+                console.warn("PENTING: URL Supabase atau Anon Key belum dikonfigurasi. Fitur login petugas tidak akan berfungsi. Silakan perbarui variabel SUPABASE_URL dan SUPABASE_ANON_KEY dalam script.");
+                // Menampilkan pesan di UI jika konfigurasi belum ada
+                const petugasErrorDiv = document.getElementById('petugasError');
+                if (petugasErrorDiv && !document.getElementById('supabaseConfigWarning')) { // Cek agar pesan tidak duplikat
+                    const warningMsg = document.createElement('p');
+                    warningMsg.id = 'supabaseConfigWarning';
+                    warningMsg.textContent = 'Peringatan: Konfigurasi Supabase belum lengkap. Login petugas mungkin tidak berfungsi.';
+                    warningMsg.className = 'text-center text-xs text-orange-600 mt-2';
+                    document.getElementById('loginPetugasContent').appendChild(warningMsg);
+                }
+
+            } else {
+                // PERBAIKAN: Menggunakan supabase.createClient bukan supabaseJs.createClient
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log("Supabase client berhasil diinisialisasi.");
+            }
+        } catch (error) {
+            console.error("Error saat inisialisasi Supabase client:", error);
+            const petugasErrorDiv = document.getElementById('petugasError');
+            if (petugasErrorDiv) {
+                showError('petugasError', 'Gagal menginisialisasi Supabase. Cek konsol untuk detail.');
+            }
+        }
+
+
+        // --- Logika Tab ---
+        const tabs = ['petugas', 'admin', 'pengunjung'];
+        const tabButtons = {
+            petugas: document.getElementById('tabPetugas'),
+            admin: document.getElementById('tabAdmin'),
+            pengunjung: document.getElementById('tabPengunjung')
+        };
+        const tabContents = {
+            petugas: document.getElementById('loginPetugasContent'),
+            admin: document.getElementById('loginAdminContent'),
+            pengunjung: document.getElementById('loginPengunjungContent')
+        };
+
+        function showTab(tabName) {
+            tabs.forEach(tab => {
+                const isActive = tab === tabName;
+                tabButtons[tab].classList.toggle('active', isActive);
+                tabContents[tab].classList.toggle('hidden', !isActive);
+            });
+            hideError('petugasError'); // Sembunyikan error saat pindah tab
+            hideError('adminError');   // Sembunyikan error saat pindah tab
+        }
+
+        // --- Penanganan Pesan Error ---
+        function showError(elementId, message) {
+            const errorDiv = document.getElementById(elementId);
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function hideError(elementId) {
+            const errorDiv = document.getElementById(elementId);
+            if (errorDiv && !errorDiv.classList.contains('hidden')) {
+                errorDiv.classList.add('hidden');
+                errorDiv.textContent = '';
+            }
+        }
+
+        // --- Penanganan Loader ---
+        function showLoader(loaderId, buttonId) {
+            const loader = document.getElementById(loaderId);
+            const button = document.getElementById(buttonId);
+            if(loader) loader.classList.remove('hidden');
+            if(button) button.disabled = true;
+        }
+
+        function hideLoader(loaderId, buttonId) {
+            const loader = document.getElementById(loaderId);
+            const button = document.getElementById(buttonId);
+            if(loader) loader.classList.add('hidden');
+            if(button) button.disabled = false;
+        }
+
+
+        // --- Login Petugas (Integrasi Supabase) ---
+        const petugasLoginForm = document.getElementById('petugasLoginForm');
+        if (petugasLoginForm) {
+            petugasLoginForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                hideError('petugasError');
+
+                // Menggunakan supabaseClient yang sudah diinisialisasi
+                if (!supabaseClient) {
+                    showError('petugasError', 'Konfigurasi Supabase tidak valid atau belum lengkap. Hubungi administrator.');
+                    return;
+                }
+
+                const email = document.getElementById('petugasEmail').value;
+                const password = document.getElementById('petugasPassword').value;
+
+                if (!email || !password) {
+                    showError('petugasError', 'Email dan password tidak boleh kosong.');
+                    return;
+                }
+
+                showLoader('petugasLoader', 'petugasLoginButton');
+
+                try {
+                    // Menggunakan supabaseClient untuk otentikasi
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password,
+                    });
+
+                    if (error) {
+                        console.error('Error login Supabase:', error);
+                        showError('petugasError', error.message || 'Login gagal. Periksa kembali email dan password Anda.');
+                        hideLoader('petugasLoader', 'petugasLoginButton');
+                        return;
+                    }
+
+                    if (data && data.user) { // Periksa data dan data.user
+                        console.log('Login Petugas Berhasil:', data.user);
+                        alert('Login Petugas Berhasil! Anda akan diarahkan ke halaman petugas.');
+                        window.location.href = '/pages/petugas.html'; // Arahkan ke halaman petugas
+                        petugasLoginForm.reset();
+                    } else if (data && !data.user && !error){ // Kasus aneh dimana tidak ada error tapi user null
+                         showError('petugasError', 'Login gagal. Tidak ada data pengguna yang diterima, meskipun tidak ada error eksplisit.');
+                    } else if (!data && !error) { // Kasus sangat aneh
+                        showError('petugasError', 'Terjadi respons yang tidak diharapkan dari server.');
+                    }
+                } catch (e) {
+                    console.error('Pengecualian saat login Supabase:', e);
+                    showError('petugasError', 'Terjadi kesalahan sistem saat mencoba login. Cek konsol.');
+                } finally {
+                    if (document.getElementById('petugasLoginButton')) {
+                         hideLoader('petugasLoader', 'petugasLoginButton');
+                    }
+                }
+            });
+        }
+
+        // --- Login Admin (Data Lokal) ---
+        const adminLoginForm = document.getElementById('adminLoginForm');
+        if (adminLoginForm) {
+            adminLoginForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                hideError('adminError');
+                const username = document.getElementById('adminUsername').value;
+                const password = document.getElementById('adminPassword').value;
+
+                if (!username || !password) {
+                    showError('adminError', 'Username dan password tidak boleh kosong.');
+                    return;
+                }
+
+                showLoader('adminLoader', 'adminLoginButton');
+
+                const adminCredentials = {
+                    username: 'tebardarling',
+                    password: 'tbdg2025'
+                };
+
+                await new Promise(resolve => setTimeout(resolve, 700));
+
+                if (username === adminCredentials.username && password === adminCredentials.password) {
+                    console.log('Login Admin Berhasil');
+                    alert('Login Admin Berhasil! Anda akan diarahkan ke halaman admin.');
+                    window.location.href = '/pages/admin.html';
+                    adminLoginForm.reset();
+                } else {
+                    showError('adminError', 'Username atau password Admin salah.');
+                }
+                if (document.getElementById('adminLoginButton')) {
+                    hideLoader('adminLoader', 'adminLoginButton');
+                }
+            });
+        }
+
+        // --- Login Pengunjung (Pengalihan) ---
+        const guestLoginButton = document.getElementById('guestLoginButton');
+        if (guestLoginButton) {
+            guestLoginButton.addEventListener('click', function() {
+                console.log('Mengalihkan ke halaman pengunjung...');
+                window.location.href = '/pages/guest.html';
+            });
+        }
+
+        // Inisialisasi dengan tab pertama aktif
+        showTab('petugas');
+    </script>
+
+</body>
+</html>
