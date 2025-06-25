@@ -1,0 +1,16 @@
+{
+  "name": "TEBARDARLING - Dashboard Petugas",
+  "short_name": "Petugas Tebardarling",
+  "description": "Aplikasi Absensi dan Pelacakan untuk Petugas Lapangan.",
+  "start_url": "/petugas.html",
+  "display": "standalone",
+  "background_color": "#f0f9ff",
+  "theme_color": "#0c4a6e",
+  "icons": [
+    {
+      "src": "assets/logotbdg.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
